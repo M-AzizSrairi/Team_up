@@ -13,6 +13,9 @@ module.exports = {
       'neutral': '#d4d4d4',      /* Neutral */
       'gray' : '#111827',
       'black' : '#0c0a09',
+    },
+    backgroundImage : {
+           'parallax' : 'url("./Assets/team.jpg")',
     }
   },
   plugins: [],
