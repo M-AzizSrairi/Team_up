@@ -9,7 +9,7 @@ import '../tailwind.css';
 const About = () => {
   return (
     <div className='w-full py-8 bg-gray text-neutral text-center'>
-      <div className='max-w-[1240px] mx-auto px-4 pt-8 '>
+      <div className='max-w-[1240px] mx-auto mb-8 px-4 pt-8 '>
         <div>
           <h1 className='py-4 text-3xl'>Services, We Provide You With</h1>
           <p className='py-4 text-xl mb-4'>
@@ -25,6 +25,11 @@ const About = () => {
             <AboutCard icon={<RiDashboardFill size={40} />} heading='Personalized Dashboards' text='Use a decentralized network of DeFi Keeper nodes to automate contracts, mitigating risk of manual interventions and centralized servers.' />
           </div>
         </div>
+      </div>
+      <div
+        className='my-16 rounded-2xl relative flex items-center justify-center mx-16 h-96 bg-fixed bg-parallax bg-cover rounded'
+      >
+        <div className=" rounded-2xl w-full h-full absolute top-0 left-0 bg-black opacity-80 z-20"></div>
       </div>
     </div>
   );

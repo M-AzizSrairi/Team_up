@@ -16,6 +16,7 @@ module.exports = {
     },
     backgroundImage : {
            'parallax' : 'url("./Assets/team.jpg")',
+           'parallax2' : 'url("./Assets/pitch.jpg")',
     }
   },
   plugins: [],
