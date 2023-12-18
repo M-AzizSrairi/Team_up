@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 const AuthFormLeft = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [userType, setUserType] = useState('player')
 
   const toggleLoginSignUp = () => {
     setIsLogin(!isLogin);
@@ -14,33 +15,41 @@ const AuthFormLeft = () => {
       <input
         type="email"
         placeholder="Email"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
       <input
         type="text"
         placeholder="User Name"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
       <input
         type="password"
         placeholder="Password"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
       <input
         type="password"
         placeholder="Confirm Password"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
       <input
         type="date"
         placeholder="Date of Birth"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
       <input
         type="text"
         placeholder="City"
-        className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+        className="p-3 bg-neutral text-gray w-full mb-3"
       />
+      <select
+        value={userType}
+        onChange={(e) => setUserType(e.target.value)}
+        className="mt-1 p-3 bg-neutral text-gray w-full"
+      >
+        <option value="player">Player</option>
+        <option value="owner">Owner</option>
+      </select>
     </div>
   );
 
@@ -71,14 +80,22 @@ const AuthFormLeft = () => {
                 placeholder="Password"
                 className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
               />
+              <select
+              value={userType}
+              onChange={(e) => setUserType(e.target.value)}
+              className="mt-1 p-3 bg-neutral text-gray w-full mb-3"
+            >
+              <option value="player">Player</option>
+              <option value="owner">Owner</option>
+            </select>
             </>
           ) : (
             registrationFields
           )}
 
-          <div className="mb-12 pb-1 pt-1 text-center">
+          <div className="mb-8 pb-1 pt-1 text-center">
             <button
-              className="mb-3 inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase bg-gray text-neutral transition duration-300 ease-in-out hover:bg-emerald hover:text-gray"
+              className="inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase bg-gray text-neutral transition duration-300 ease-in-out hover:bg-emerald hover:text-gray"
               type="button"
             >
               {isLogin ? 'Log in' : 'Register'}
