@@ -7,6 +7,7 @@ import About from "./Components/About";
 import FAQs from "./Components/FAQs";
 import Footer from "./Components/Footer";
 import AuthForm from "./Components/AuthForm";
+import PlayerNavbar from "./Components/PlayerNavbar"
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Footer />
         </div>} />
         <Route path="/auth" element={<AuthForm />} />
+        <Route path="/user" element={<PlayerNavbar/>} />
       </Routes>
     </Router>
   );
