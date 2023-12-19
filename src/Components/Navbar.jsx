@@ -16,7 +16,7 @@ const Navbar = () => {
       </div>
 
       {/* Replace the button with Link */}
-      <Link to="/auth">
+      <Link to="/login">
         <button className="bg-orange text-white rounded-full px-4 py-2 transition duration-300 ease-in-out hover:bg-emerald">
           Get Started
         </button>
