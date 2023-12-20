@@ -1,3 +1,4 @@
+# main.py
 import uvicorn
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -9,6 +10,10 @@ from sqlalchemy.sql import select
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
+from jose import JWTError, jwt
+from datetime import datetime, timedelta
+
 
 app = FastAPI()
 
@@ -112,13 +117,37 @@ async def register(user_data: UserRegistration):
         print(f"Error during registration: {e}")
         raise
 
+import secrets
+
+SECRET_KEY = secrets.token_urlsafe(32)
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+# Pydantic model for the token response
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+# Function to create a new JWT token
+def create_access_token(data: dict):
+    expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expires_date = datetime.utcnow() + expires_delta
+    to_encode = data.copy()
+    to_encode.update({"exp": expires_date})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# OAuth2PasswordBearer for handling token authentication (you may have this already)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
 # Pydantic model for user login
 class UserLogin(BaseModel):
     username: str
     password: str
 
-# Login endpoint
-@app.post("/login", response_model=dict)
+# Login endpoint with JWT token issuance
+@app.post("/login", response_model=Token)
 async def login(user_data: UserLogin):
     try:
         # Check if the user exists in the player table
@@ -126,14 +155,18 @@ async def login(user_data: UserLogin):
         player_result = await database.fetch_one(player_query)
 
         if player_result and player_result["password"] == user_data.password:
-            return {"message": "Login successful"}
+            token_data = {"sub": user_data.username, "userType": "player"}
+            access_token = create_access_token(token_data)
+            return {"access_token": access_token, "token_type": "bearer"}
 
         # Check if the user exists in the owner table
         owner_query = owner_table.select().where(owner_table.c.username == user_data.username)
         owner_result = await database.fetch_one(owner_query)
 
         if owner_result and owner_result["password"] == user_data.password:
-            return {"message": "Login successful"}
+            token_data = {"sub": user_data.username, "userType": "owner"}
+            access_token = create_access_token(token_data)
+            return {"access_token": access_token, "token_type": "bearer"}
 
         # If user not found, raise HTTPException
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -143,6 +176,15 @@ async def login(user_data: UserLogin):
     except Exception as e:
         print(f"Error during login: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    
+# Added endpoint to get user details
+@app.get("/getLoggedInUser", response_model=dict)
+async def get_logged_in_user(username: str = Depends(oauth2_scheme)):
+    return {"username": username}
+
+
+
 
 if __name__ == "__main__":
     uvicorn.run("app.api:app", host="127.0.0.1", port=8000, reload=True)

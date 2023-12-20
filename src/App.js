@@ -51,7 +51,7 @@ function App() {
         />
 
         <Route
-          path="/profile"
+          path="/profile/:userType/:username"
           element={
             <div className="ownerProfile">
               <Owner />

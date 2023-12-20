@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { parseJwt } from './authUtils';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const Login = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
         body: JSON.stringify({
           username: formData.username,
@@ -31,11 +33,37 @@ const Login = () => {
         }),
       });
 
+      console.log('Access Token:', localStorage.getItem('accessToken'));
+  
       if (response.ok) {
-        // Login successful
-        console.log('Login successful');
-        // Navigate to the user's profile (replace '/profile' with the actual path)
-        navigate('/profile');
+        const data = await response.json();
+  
+        if (data.access_token) {
+          // Store the received access token in localStorage
+          localStorage.setItem('accessToken', data.access_token);
+  
+          // Extract user type and username from the token payload
+          const tokenPayload = parseJwt(data.access_token);
+          const userType = tokenPayload.userType;
+          const username = tokenPayload.sub;
+          console.log("data", data.access_token);
+          console.log("userType", userType);
+          console.log("username", username)
+  
+          if (userType && username) {
+            // Construct profile URL
+            const profileURL = `/profile/${userType}/${username}`;
+  
+            // Navigate to the user's profile
+            navigate(profileURL);
+          } else {
+            console.error('User type or username not found in token payload:', tokenPayload);
+            setError('An unexpected error occurred. Please try again.');
+          }
+        } else {
+          console.error('Access token not found in response:', data);
+          setError('Login failed. Please try again.');
+        }
       } else {
         // Handle errors from the server
         const data = await response.json();
@@ -43,10 +71,21 @@ const Login = () => {
         setError(data.detail || 'Login failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error during login:', error.message);
+      console.error('Error during login:', error);
       setError('An unexpected error occurred. Please try again.');
     }
   };
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   return (
     <div className="flex items-center justify-center px-4 lg:w-6/12">
