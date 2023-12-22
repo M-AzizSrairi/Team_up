@@ -1,5 +1,5 @@
-// useLoggedInUser.js
 import { useState, useEffect } from 'react';
+import { parseJwt } from './authUtils';
 
 const useLoggedInUser = () => {
   const [loggedInUser, setLoggedInUser] = useState(null);
@@ -10,26 +10,15 @@ const useLoggedInUser = () => {
         const accessToken = localStorage.getItem('accessToken');
 
         if (!accessToken) {
-          // Handle the case when the user is not authenticated
           setLoggedInUser(null);
           return;
         }
 
-        const response = await fetch('http://localhost:8000/getLoggedInUser', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const decodedUser = parseJwt(accessToken);
 
-        if (response.ok) {
-          const data = await response.json();
-          setLoggedInUser(data);
-        } else {
-          // Handle the case when the user is not authenticated
-          setLoggedInUser(null);
-        }
+        setLoggedInUser(decodedUser);
       } catch (error) {
-        console.error('Error fetching logged-in user:', error);
+        console.error('Error decoding logged-in user:', error);
         setLoggedInUser(null);
       }
     };

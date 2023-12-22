@@ -1,16 +1,18 @@
 # main.py
 import uvicorn
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, File, UploadFile, Form, status
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from databases import Database
-from sqlalchemy import Column, String, DateTime, MetaData, Table, func
-from sqlalchemy.sql import select
+from sqlalchemy import Column, String, DateTime, MetaData, Table, func, ForeignKey, Integer, LargeBinary, Text
+from sqlalchemy.types import Float
+from sqlalchemy.sql import select, insert
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 
@@ -114,7 +116,6 @@ async def register(user_data: UserRegistration):
 
         return {"message": "User registered successfully"}
     except Exception as e:
-        print(f"Error during registration: {e}")
         raise
 
 import secrets
@@ -174,7 +175,6 @@ async def login(user_data: UserLogin):
     except HTTPException as e:
         raise e
     except Exception as e:
-        print(f"Error during login: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
     
@@ -184,6 +184,132 @@ async def get_logged_in_user(username: str = Depends(oauth2_scheme)):
     return {"username": username}
 
 
+
+
+from pydantic import ValidationError
+import json
+import base64
+
+from fastapi import File, UploadFile, Form
+from fastapi.responses import JSONResponse
+
+
+
+
+
+
+# SQLAlchemy model for the Venue table
+venue_table = Table(
+    "venue",
+    metadata,
+    Column("ownerusername", String, ForeignKey("owner.username", ondelete="CASCADE")),
+    Column("ownername", String),
+    Column("phonenumber", String),
+    Column("city", String),
+    Column("country", String),
+    Column("location", String, primary_key=True),
+    Column("workingdays", String),
+    Column("price", String),
+    Column("capacity", Integer),
+    Column("area", String),
+    Column("facilities", String),
+    Column("description", String), 
+    Column("reviews", Float),
+    Column("numberOfTimesChecked", Integer),
+    Column("numberOfTimesBooked", Integer),
+    Column("availability", String, default='yes'),
+)
+
+# SQLAlchemy model for the Venue table
+images_table = Table(
+    "images",
+    metadata,
+    Column("image_id", Integer, primary_key=True),
+    Column("ownerusername", String, ForeignKey("venues.ownerusername")),
+    Column("location", String, ForeignKey("venues.location")),
+    Column("image_name", String),
+    Column("image_url", String),
+)
+
+# Pydantic model for venue creation
+class VenueCreate(BaseModel):
+    ownerusername: str
+    ownername: str
+    phonenumber: str
+    city: str
+    country: str
+    location: str
+    workingdays: str
+    price: str
+    capacity: int
+    area: str
+    facilities: str
+    description: str
+    images: List[str]
+
+import logging
+
+@app.post("/createVenue", response_model=dict)
+async def create_venue(
+    venue_data: VenueCreate,
+    current_user: dict = Depends(get_logged_in_user),
+):
+    try:
+        # Logging statement to print information about the received request
+        logging.info(f"Received request from {current_user['username']}")
+        logging.info(f"Request data: {venue_data.dict()}")
+        
+        # Ensure that the owner username is obtained dynamically
+        venue_data_dict = venue_data.dict()
+
+        # Insert venue data into the venue table
+        query_insert_venue = insert(venue_table).values(
+            ownerusername=venue_data_dict["ownerusername"],
+            ownername=venue_data_dict["ownername"],
+            phonenumber=venue_data_dict["phonenumber"],
+            city=venue_data_dict["city"],
+            country=venue_data_dict["country"],
+            location=venue_data_dict["location"],
+            workingdays=venue_data_dict["workingdays"],
+            price=venue_data_dict["price"],
+            capacity=venue_data_dict["capacity"],
+            area=venue_data_dict["area"],
+            facilities=venue_data_dict["facilities"],
+            description=venue_data_dict["description"],
+        )
+        venue_id = await database.execute(query_insert_venue)
+
+        # Insert image URLs into the images table
+        for i, image_url in enumerate(venue_data.images):
+            query_insert_image = insert(images_table).values(
+                ownerusername=venue_data_dict["ownerusername"],
+                location=venue_data_dict["location"],
+                image_name=f"Image {i + 1}",
+                image_url=image_url,
+            )
+            await database.execute(query_insert_image)
+
+        return {"message": "Venue created successfully"}
+    except Exception as e:
+        # Log the error or return a more informative response
+        print(f"Error creating venue: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": "Internal Server Error"},
+        )
+
+
+
+
+
+
+
+import base64
+from fastapi import HTTPException
+
+@app.options("/createVenue")
+async def options_create_venue():
+    return {"msg": "OK"}
 
 
 if __name__ == "__main__":
