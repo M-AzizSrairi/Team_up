@@ -212,7 +212,7 @@ venue_table = Table(
     Column("price", String),
     Column("capacity", Integer),
     Column("area", String),
-    Column("facilities", String),
+    Column("ground", String),
     Column("description", String), 
     Column("reviews", Float),
     Column("numberoftimeschecked", Integer),
@@ -243,7 +243,7 @@ class VenueCreate(BaseModel):
     price: str
     capacity: int
     area: str
-    facilities: str
+    ground: str
     description: str
     images: List[str]
 
@@ -274,7 +274,7 @@ async def create_venue(
             price=venue_data_dict["price"],
             capacity=venue_data_dict["capacity"],
             area=venue_data_dict["area"],
-            facilities=venue_data_dict["facilities"],
+            ground=venue_data_dict["ground"],
             description=venue_data_dict["description"],
         )
         venue_id = await database.execute(query_insert_venue)
@@ -343,7 +343,7 @@ class VenueResponse(BaseModel):
     price: str
     capacity: int
     area: str
-    facilities: str
+    ground: str
     description: str
     images: List[str]
 
@@ -378,6 +378,60 @@ async def get_all_venues():
         return venues_response
     except Exception as e:
         print(f"Error fetching venues: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
+
+from fastapi import Query
+
+
+# Create a new endpoint for filtered venues
+@app.get("/getFilteredVenues", response_model=List[VenueResponse])
+async def get_filtered_venues(
+    city: str = Query(None, description="Filter by city"),
+    country: str = Query(None, description="Filter by country"),
+    pitch_type: str = Query(None, description="Filter by pitch type"),
+    price_range: int = Query(None, description="Filter by price range"),
+    capacity_range: int = Query(None, description="Filter by capacity range"),
+):
+    try:
+        # Start building the base query
+        query_venues = select([venue_table])
+
+        # Apply filters based on query parameters
+        if city:
+            query_venues = query_venues.where(venue_table.c.city == city)
+
+        if country:
+            query_venues = query_venues.where(venue_table.c.country == country)
+
+        # Add more conditions for other filters (e.g., pitch type, price range, capacity range)
+
+        # Fetch filtered venues
+        venues = await database.fetch_all(query_venues)
+
+        # Fetch images for each venue
+        venues_list = []
+        for venue in venues:
+            venue_dict = dict(venue)
+            query_images = select([images_table.c.image_url]).where(
+                (images_table.c.location == venue_dict['location']) &
+                (images_table.c.ownerusername == venue_dict['ownerusername'])
+            )
+            images = await database.fetch_all(query_images)
+            venue_dict['images'] = [image['image_url'] for image in images]
+            venues_list.append(venue_dict)
+
+        # Ensure that the 'images' attribute is always a list
+        for venue in venues_list:
+            venue['images'] = venue.get('images', [])
+
+        # Convert the list of dictionaries to VenueResponse objects
+        venues_response = [VenueResponse(**{key: venue[key] for key in VenueResponse.__annotations__}) for venue in venues_list]
+
+        print('Filtered venues sent to client:', venues_response)
+        return venues_response
+    except Exception as e:
+        print(f"Error fetching filtered venues: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
 

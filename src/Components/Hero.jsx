@@ -19,7 +19,7 @@ const Hero = () => {
       />
 
       {/* Text and content */}
-      <div className="w-full h-[90%] flex flex-col justify-center items-center text-neutral px-4 text-center text-4xl relative z-50">
+      <div className="w-full h-[90%] flex flex-col justify-center items-center text-neutral px-4 text-center text-4xl relative z-40">
         <h1>Team Up</h1>
         <h1 className="py-2">
           <span className="blue">and Find</span> the Best Venue

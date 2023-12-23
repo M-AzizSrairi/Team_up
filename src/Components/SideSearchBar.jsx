@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { cities, countries, pitchTypes } from './filterOptions'; // Adjust the path accordingly
 
-const SideSearchBar = () => {
-  // You can add state and functions to handle filter changes
-  // State to track range values
-  const [priceRange, setPriceRange] = useState(0);
-  const [capacityRange, setCapacityRange] = useState(0);
-  const [selectedCity, setSelectedCity] = useState('all');
-  const [selectedCountry, setSelectedCountry] = useState('all');
-  const [selectedPitchType, setSelectedPitchType] = useState('all');
+const SideSearchBar = ({ applyFilters }) => {
+    const [priceRange, setPriceRange] = useState(0);
+    const [capacityRange, setCapacityRange] = useState(0);
+    const [selectedCity, setSelectedCity] = useState('all');
+    const [selectedCountry, setSelectedCountry] = useState('all');
+    const [selectedPitchType, setSelectedPitchType] = useState('all');
+  
+    const handleApplyFilters = () => {
+      // Construct an object with filter options
+      const filters = {
+        city: selectedCity,
+        country: selectedCountry,
+        pitch_type: selectedPitchType,
+        price_range: priceRange,
+        capacity_range: capacityRange,
+      };
+  
+      // Pass the filters to the parent component
+      applyFilters(filters);
+    };
 
   return (
     <div className="p-4 text-neutral">
@@ -85,7 +97,15 @@ const SideSearchBar = () => {
 
       {/* Add more filter options based on your data */}
 
-      <button className="mt-4 bg-emerald text-gray px-4 py-1 rounded hover:bg-orange">
+      <button
+        onClick={() => applyFilters({
+          city: selectedCity,
+          country: selectedCountry,
+          pitch_type: selectedPitchType,
+          // Add other filters here
+        })}
+        className="mt-4 bg-emerald text-gray px-4 py-1 rounded hover:bg-orange"
+      >
         Apply Filters
       </button>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useLoggedInUser from './useLoggedInUser';
+import {pitchTypes } from './filterOptions';
 import { parseJwt } from './authUtils';
 
 const AddVenue = () => {
@@ -30,7 +31,7 @@ const AddVenue = () => {
     price: '',
     capacity: '',
     area: '',
-    facilities: '',
+    ground: '',
     description: '',
     images: [],
   });
@@ -281,18 +282,24 @@ const handleSubmit = async (e) => {
               className="mt-1 p-2 w-full border bg-neutral text-gray rounded-md"
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="facilities" className="block text-sm font-medium text-gray-700">
-              Facilities
+            <div className="mb-4">
+            <label htmlFor="ground" className="block text-sm font-medium text-gray-700">
+              Ground
             </label>
-            <input
-              type="text"
-              id="facilities"
-              name="facilities"
-              value={venueData.facilities}
+            <select
+              id="ground"
+              name="ground"
+              value={venueData.ground}
               onChange={handleChange}
               className="mt-1 p-2 w-full border bg-neutral text-gray rounded-md"
-            />
+            >
+              <option value="" disabled>Select Ground</option>
+              {pitchTypes.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="mb-4">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">

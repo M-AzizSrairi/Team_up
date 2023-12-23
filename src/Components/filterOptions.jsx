@@ -3,7 +3,7 @@
 export const cities = [
     { label: 'All Cities', value: 'all' },
     { label: 'Ariana', value: 'ariana' },
-    { label: 'Ben Arous', value: 'benarous' },
+    { label: 'Ben Arous', value: 'Ben Arous' },
     { label: 'Bizerte', value: 'bizerte' },
     { label: 'Baja', value: 'baja' },
     { label: 'Gabes', value: 'gabes' },
@@ -24,8 +24,8 @@ export const cities = [
     { label: 'Sousse', value: 'sousse' },
     { label: 'Tattaouine', value: 'tattaouine' },
     { label: 'Tozeur', value: 'tozeur' },
-    { label: 'Tunis', value: 'tunis' },
-    { label: 'Zaghouan', value: 'zaghouan' },
+    { label: 'Tunis', value: 'Tunis' },
+    { label: 'Zaghouan', value: 'Zaghouan' },
   ];
   
   
@@ -208,7 +208,7 @@ export const countries = [
     { label: 'Togo', value: 'togo' },
     { label: 'Tonga', value: 'tonga' },
     { label: 'Trinidad and Tobago', value: 'trinidad_and_tobago' },
-    { label: 'Tunisia', value: 'tunisia' },
+    { label: 'Tunisia', value: 'Tunisia' },
     { label: 'Turkey', value: 'turkey' },
     { label: 'Turkmenistan', value: 'turkmenistan' },
     { label: 'Tuvalu', value: 'tuvalu' },
