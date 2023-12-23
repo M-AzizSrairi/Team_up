@@ -215,8 +215,8 @@ venue_table = Table(
     Column("facilities", String),
     Column("description", String), 
     Column("reviews", Float),
-    Column("numberOfTimesChecked", Integer),
-    Column("numberOfTimesBooked", Integer),
+    Column("numberoftimeschecked", Integer),
+    Column("numberoftimesbooked", Integer),
     Column("availability", String, default='yes'),
 )
 
@@ -297,19 +297,96 @@ async def create_venue(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"detail": "Internal Server Error"},
         )
-
-
-
-
-
-
-
 import base64
 from fastapi import HTTPException
 
 @app.options("/createVenue")
 async def options_create_venue():
     return {"msg": "OK"}
+
+# Endpoint to get venues for the current user
+@app.get("/getVenuesForCurrentOwner", response_model=List[VenueCreate])
+async def get_venues_for_user(current_user: dict = Depends(get_logged_in_user)):
+    try:
+        # Fetch venues based on the current user's ownerusername
+        query_venues = select([venue_table]).where(venue_table.c.ownerusername == current_user['username'])
+        venues = await database.fetch_all(query_venues)
+        
+        # Convert venues to a list of dictionaries
+        venues_list = [dict(venue) for venue in venues]
+        
+        # Fetch images for each venue
+        for venue in venues_list:
+            query_images = select([images_table.c.image_url]).where(
+                (images_table.c.location == venue['location']) &
+                (images_table.c.ownerusername == venue['ownerusername'])
+            )
+            images = await database.fetch_all(query_images)
+            venue['images'] = [image['image_url'] for image in images]
+            
+        print('Venues sent to client:', venues_list)
+        return venues_list
+    except Exception as e:
+        print(f"Error fetching venues: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+    
+
+# Update VenueResponse model to exclude unwanted fields
+class VenueResponse(BaseModel):
+    ownerusername: str
+    ownername: str
+    phonenumber: str
+    city: str
+    country: str
+    location: str
+    workingdays: str
+    price: str
+    capacity: int
+    area: str
+    facilities: str
+    description: str
+    images: List[str]
+
+# Update /getVenues endpoint to use the modified VenueResponse model
+@app.get("/getVenues", response_model=List[VenueResponse])
+async def get_all_venues():
+    try:
+        # Fetch all venues
+        query_venues = select([venue_table])
+        venues = await database.fetch_all(query_venues)
+
+        # Fetch images for each venue
+        venues_list = []
+        for venue in venues:
+            venue_dict = dict(venue)
+            query_images = select([images_table.c.image_url]).where(
+                (images_table.c.location == venue_dict['location']) &
+                (images_table.c.ownerusername == venue_dict['ownerusername'])
+            )
+            images = await database.fetch_all(query_images)
+            venue_dict['images'] = [image['image_url'] for image in images]
+            venues_list.append(venue_dict)
+
+        # Ensure that the 'images' attribute is always a list
+        for venue in venues_list:
+            venue['images'] = venue.get('images', [])
+
+        # Convert the list of dictionaries to VenueResponse objects
+        venues_response = [VenueResponse(**{key: venue[key] for key in VenueResponse.__annotations__}) for venue in venues_list]
+
+        print('Venues sent to client:', venues_response)
+        return venues_response
+    except Exception as e:
+        print(f"Error fetching venues: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

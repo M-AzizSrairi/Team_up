@@ -10,6 +10,7 @@ import PlayerNavbar from "./Components/PlayerNavbar";
 import LoginPage from "./Components/LoginPage";
 import RegisterPage from "./Components/RegisterPage";
 import Owner from "./Components/Owner";
+import Venues from "./Components/Venues";
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
         />
 
         <Route
-          path="/profile/:userType/:username"
+          path="/profile/owner/:username"
           element={
             <div className="ownerProfile">
               <Owner />
@@ -59,11 +60,14 @@ function App() {
           }
         />
 
-        {/* Authenticated user routes */}
         <Route
-          path="/user"
-          element={<PlayerNavbar />}
-          // Add nested routes for authenticated user pages as needed
+          path="/profile/player/:username"
+          element={
+            <div className="ownerProfile">
+              <PlayerNavbar />
+              <Venues/>
+            </div>
+          }
         />
       </Routes>
     </Router>

@@ -1,42 +1,24 @@
+// VenueCard.jsx
 import React from 'react';
-import defaultImage from '../Assets/defaultpitch.jpg'; 
 import '../tailwind.css';
 
-
-const VenueCard = (props) => {
+const VenueCard = ({ imageSrc, descriptionText }) => {
   return (
-    <div className="bg-gray h-fit m-4 text-neutral border-b border-neutra mx-8">
-      {/* Left column for images */}
-      <div className="float-left">
-        <img src={defaultImage} alt="Default" className="w-60 h-40 mx-2 py-2" />
-      </div>
-      
-      {/* Right column for details */}
-      <div className="px-12">
-        {/* Description at the top */}
-        <h2 className="text-l text-emerald font-bold mb-4">Venue Description: </h2>
-        <p> {props.Description}</p>
-        
-        {/* Two columns */}
-        <div className="flex">
-          {/* First column */}
-          <div className="flex-1">
-            <p>Owner: {props.owner}</p>
-            <p>Phone Number: {props.phoneNumber}</p>
-            <p>City: {props.city}</p>
-            <p>Country: {props.country}</p>
-            <p>Location: {props.location}</p>
-          </div>
-          
-          {/* Second column */}
-          <div className="flex-1">
-            <p>Working Days: {props.workingDays}</p>
-            <p>Price: {props.price}</p>
-            <p>Capacity: {props.capacity}</p>
-            <p>Area: {props.area}</p>
-            <p>Facilities: {props.facilities}</p>
-          </div>
-        </div>
+    <div className="max-w-sm text-neutral bg-gray border border-neutral rounded-lg shadow">
+      <a href="#">
+        <img className="rounded-t-lg h-90" src={imageSrc} alt="" />
+      </a>
+      <div className="p-5">
+        <a href="#">
+          <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Description</h5>
+        </a>
+        <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">{descriptionText}</p>
+        <a href="#" className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray text-white bg-emerald rounded-lg hover:bg-orange">
+          See more
+          <svg className="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+          </svg>
+        </a>
       </div>
     </div>
   );
