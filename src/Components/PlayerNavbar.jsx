@@ -30,7 +30,7 @@ import {
    } from 'react-icons/tb';
 import { parseJwt } from './authUtils';
 
-const OwnerNavbar = () => {
+const PlayerNavbar= () => {
   const loggedInUsername = parseJwt(localStorage.getItem('accessToken')).sub;
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
@@ -190,4 +190,4 @@ const OwnerNavbar = () => {
   );
 };
 
-export default OwnerNavbar;
+export default PlayerNavbar;

@@ -6,7 +6,7 @@ const VenueCard = ({ imageSrc, descriptionText }) => {
   return (
     <div className="max-w-sm text-neutral bg-gray border border-neutral rounded-lg shadow">
       <a href="#">
-        <img className="rounded-t-lg h-90" src={imageSrc} alt="" />
+        <img className="rounded-t-lg h-60 w-full object-cover" src={imageSrc} alt="" />
       </a>
       <div className="p-5">
         <a href="#">

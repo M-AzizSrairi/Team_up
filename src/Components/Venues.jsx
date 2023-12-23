@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import VenueCard from './VenueCard';
+import SideSearchBar from './SideSearchBar';
 
 const Venues = () => {
   console.log('Rendering Venues component');
@@ -40,15 +41,20 @@ const Venues = () => {
   }, []);
 
   return (
-    <div className="ml-auto flex flex-wrap gap-4 mx-2 bg-gray">
-      {venuesData.map((venue) => (
-        <VenueCard
-          key={venue.location}
-          imageSrc={venue.images[0]}
-          descriptionText={venue.description}
-          className="mx-12"
-        />
-      ))}
+    <div className="flex my-4">
+      <div className='w-1/4 bg-gray'>
+        {/* This is the side search bar where you will filter your data to get accurate research */}
+        <SideSearchBar />
+      </div>
+      <div className="w-3/4 mt-6 mx-8 grid grid-cols-3 gap-4 bg-gray">
+        {venuesData.map((venue) => (
+          <VenueCard
+            key={venue.location}
+            imageSrc={venue.images[0]}
+            descriptionText={venue.description}
+          />
+        ))}
+      </div>
     </div>
   );
 };

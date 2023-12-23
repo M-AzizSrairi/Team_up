@@ -6,11 +6,10 @@ import AboutUs from "./Components/AboutUs";
 import About from "./Components/About";
 import FAQs from "./Components/FAQs";
 import Footer from "./Components/Footer";
-import PlayerNavbar from "./Components/PlayerNavbar";
 import LoginPage from "./Components/LoginPage";
 import RegisterPage from "./Components/RegisterPage";
 import Owner from "./Components/Owner";
-import Venues from "./Components/Venues";
+import Player from "./Components/Player";
 
 function App() {
   return (
@@ -63,9 +62,8 @@ function App() {
         <Route
           path="/profile/player/:username"
           element={
-            <div className="ownerProfile">
-              <PlayerNavbar />
-              <Venues/>
+            <div className="playerProfile">
+              <Player/>
             </div>
           }
         />

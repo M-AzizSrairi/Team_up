@@ -15,7 +15,6 @@ const Owner = () => {
       {loggedInUser && (
         <>
           <OwnerNavbar loggedInUsername={loggedInUser.username} />
-          <Venues/>
           <AddVenue />
         </>
       )}
