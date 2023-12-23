@@ -47,6 +47,8 @@ const Venues = () => {
     fetchData(`/getFilteredVenues?${queryParams.toString()}`);
   };
 
+  console.log('venuesData:', venuesData);
+  
   return (
     <div className="flex my-4 py-4">
       <div className="w-1/4 bg-gray">
@@ -54,11 +56,12 @@ const Venues = () => {
       </div>
       <div className="w-3/4 mt-6 mx-8 grid grid-cols-3 gap-4 bg-gray">
         {filteredVenuesData.map((venue) => (
-          <VenueCard
-            key={venue.location}
-            imageSrc={venue.images[0]}
-            descriptionText={venue.description}
-          />
+         <VenueCard
+         key={venue.location}
+         imageSrc={venue.images[0]}
+         descriptionText={venue.description}
+         venueDetails={venue}
+       />
         ))}
       </div>
     </div>
