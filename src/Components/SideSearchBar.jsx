@@ -102,7 +102,8 @@ const SideSearchBar = ({ applyFilters }) => {
           city: selectedCity,
           country: selectedCountry,
           pitch_type: selectedPitchType,
-          // Add other filters here
+          price_range: priceRange,
+          capacity_range: capacityRange,
         })}
         className="mt-4 bg-emerald text-gray px-4 py-1 rounded hover:bg-orange"
       >
