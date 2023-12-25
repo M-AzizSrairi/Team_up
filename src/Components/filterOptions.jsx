@@ -19,7 +19,7 @@ export const cities = [
     { label: 'Monastir', value: 'monastir' },
     { label: 'Nabeul', value: 'nabeul' },
     { label: 'Seliana', value: 'seliana' },
-    { label: 'Sfax', value: 'sfax' },
+    { label: 'Sfax', value: 'Sfax' },
     { label: 'Sidi Bou Zid', value: 'sidibouzid' },
     { label: 'Sousse', value: 'sousse' },
     { label: 'Tattaouine', value: 'tattaouine' },

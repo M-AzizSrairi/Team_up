@@ -1,5 +1,6 @@
 import React from 'react';
 import { FaWindowClose } from 'react-icons/fa';
+import { Link } from 'react-router-dom';  // Import Link from React Router
 import '../tailwind.css';
 
 const VenueDetailsOverlay = ({ venueDetails, onClose }) => {
@@ -26,39 +27,41 @@ const VenueDetailsOverlay = ({ venueDetails, onClose }) => {
               <h2 className="text-2xl font-bold mb-8">{description}</h2>
             </div>
             <div className="inline-grid grid-cols-2 gap-x-24">
-            <div>
-            <div className='mb-4'>
-                <span className="font-semibold">Location:</span> <a href={location} target="_blank" rel="noopener noreferrer" className="text-emerald hover:underline">See Maps</a>
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">City:</span> {city}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Country:</span> {country}
-            </div>
-            <div className="mb-4">
-              <span className="font-semibold">Working Days:</span> {workingdays}
+              <div>
+                <div className='mb-4'>
+                  <span className="font-semibold">Location:</span> <a href={location} target="_blank" rel="noopener noreferrer" className="text-emerald hover:underline">See Maps</a>
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">City:</span> {city}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Country:</span> {country}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Working Days:</span> {workingdays}
+                </div>
+              </div>
+              <div>
+                <div className="mb-4">
+                  <span className="font-semibold">Price:</span> {price}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Capacity:</span> {capacity}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Ground:</span> {ground}
+                </div>
+                <div className="mb-4">
+                  <span className="font-semibold">Area:</span> {area}
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-              <div className="mb-4">
-                <span className="font-semibold">Price:</span> {price}
-              </div>
-              <div className="mb-4">
-                <span className="font-semibold">Capacity:</span> {capacity}
-              </div>
-              <div className="mb-4">
-                <span className="font-semibold">Ground:</span> {ground}
-              </div>
-              <div className="mb-4">
-                <span className="font-semibold">Area:</span> {area}
-              </div>
-          </div>
-          </div>
-          </div>
-                    <button className='bg-emerald w-full rounded p-2 text-gray'>
-                        Book Now!
-                    </button>
+          {/* Link to Booking Form */}
+          <Link to={`/book-venue/${encodeURIComponent(location)}`} className='bg-emerald w-full rounded p-2 text-gray'>
+            Book Now!
+        </Link>
+
         </div>
         <button
           onClick={onClose}
