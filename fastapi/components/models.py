@@ -38,7 +38,7 @@ class VenueCreate(BaseModel):
     country: str
     location: str
     workingdays: str
-    price: str
+    price: int
     capacity: int
     area: str
     ground: str
@@ -54,7 +54,7 @@ class VenueResponse(BaseModel):
     country: str
     location: str
     workingdays: str
-    price: str
+    price: int
     capacity: int
     area: str
     ground: str
@@ -103,7 +103,7 @@ venue_table = Table(
     Column("country", String),
     Column("location", String, primary_key=True),
     Column("workingdays", String),
-    Column("price", String),
+    Column("price", Integer),
     Column("capacity", Integer),
     Column("area", String),
     Column("ground", String),

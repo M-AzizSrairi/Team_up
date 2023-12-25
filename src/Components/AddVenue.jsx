@@ -248,7 +248,7 @@ const handleSubmit = async (e) => {
               Price
             </label>
             <input
-              type="text"
+              type="number"
               id="price"
               name="price"
               value={venueData.price}

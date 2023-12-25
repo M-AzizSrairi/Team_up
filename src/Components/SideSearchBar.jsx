@@ -61,7 +61,15 @@ const SideSearchBar = ({ applyFilters }) => {
       {/* Price range filter */}
       <div className="mb-4">
         <label className="block mb-2">Price Range:</label>
-        <input type="range" min="0" max="100" step="5" className="w-full" />
+        <input
+          type="range"
+          min="0"
+          max="100"
+          step="5"
+          value={priceRange}
+          onChange={(e) => setPriceRange(Number(e.target.value))}
+          className="w-full"
+        />
       </div>
 
       {/* Capacity range filter */}
@@ -73,7 +81,7 @@ const SideSearchBar = ({ applyFilters }) => {
           max="100"
           step="5"
           value={capacityRange}
-          onChange={(e) => setCapacityRange(e.target.value)}
+          onChange={(e) => setCapacityRange(Number(e.target.value))}
           className="w-full"
         />
       </div>
@@ -94,8 +102,6 @@ const SideSearchBar = ({ applyFilters }) => {
           ))}
         </select>
       </div>
-
-      {/* Add more filter options based on your data */}
 
       <button
         onClick={() => applyFilters({

@@ -157,7 +157,16 @@ async def get_filtered_venues(
         if country:
             query_venues = query_venues.where(venue_table.c.country == country)
 
-        # Add more conditions for other filters (e.g., pitch type, price range, capacity range)
+        if pitch_type:
+            query_venues = query_venues.where(venue_table.c.ground == pitch_type)
+
+        # Apply filters for price range if provided
+        if price_range is not None:
+            query_venues = query_venues.where(venue_table.c.price <= price_range)
+
+        # Apply filters for capacity range if provided
+        if capacity_range is not None:
+            query_venues = query_venues.where(venue_table.c.capacity <= capacity_range)
 
         # Fetch filtered venues
         venues = await database.fetch_all(query_venues)
@@ -181,7 +190,7 @@ async def get_filtered_venues(
         # Convert the list of dictionaries to VenueResponse objects
         venues_response = [VenueResponse(**{key: venue[key] for key in VenueResponse.__annotations__}) for venue in venues_list]
 
-        print('Filtered venues sent to client:', venues_response)
+        print('Filtered venues sent to the client:', venues_response)
         return venues_response
     except Exception as e:
         print(f"Error fetching filtered venues: {e}")
