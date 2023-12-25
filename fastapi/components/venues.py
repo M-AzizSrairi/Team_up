@@ -2,16 +2,18 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import select, insert
+from sqlalchemy.sql import select, insert, update, delete
 from .authentication import oauth2_scheme, create_access_token
 from datetime import date, datetime, timedelta
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
-from .models import VenueCreate, venue_table, images_table, VenueResponse, VenueCreate
+from .models import VenueCreate, venue_table, images_table, VenueResponse, VenueCreate, VenueUpdate, VenueDelete
 from .authentication import get_logged_in_user
 from .database import database
+from fastapi import Body
+
 
 
 router = APIRouter()
@@ -195,7 +197,104 @@ async def get_filtered_venues(
     except Exception as e:
         print(f"Error fetching filtered venues: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+    
 
-# Helper function to get the currently logged-in user
-async def get_logged_in_user(username: str = Depends(oauth2_scheme)):
-    return {"username": username}
+@router.put("/updateVenue", response_model=dict)
+async def update_venue(venue_data: VenueUpdate):
+    try:
+        # Check if the venue belongs to the current owner
+        query_check_ownership = select([venue_table.c.ownerusername]).where(
+            (venue_table.c.location == venue_data.location) & (venue_table.c.ownerusername == venue_data.ownerusername)
+        )
+        owner_username = await database.execute(query_check_ownership)
+
+        if not owner_username:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not the owner of this venue.",
+            )
+
+        # Convert Pydantic model to dictionary and filter out unset values
+        update_data = venue_data.model_dump(exclude_unset=True)
+
+        # Extract images from update_data
+        images = update_data.pop("images", None)
+
+        # Update venue data in the database
+        if update_data:
+            query_update_venue = (
+                update(venue_table)
+                .where(venue_table.c.location == venue_data.location)
+                .values(**update_data)
+            )
+            await database.execute(query_update_venue)
+
+        # Handle image updates separately
+        if images:
+            # First, delete existing images for the venue
+            delete_query = images_table.delete().where(
+                (images_table.c.location == venue_data.location) &
+                (images_table.c.ownerusername == venue_data.ownerusername)
+            )
+            await database.execute(delete_query)
+
+            # Insert new images for the venue
+            for i, image_url in enumerate(images):
+                insert_query = insert(images_table).values(
+                    ownerusername=venue_data.ownerusername,
+                    location=venue_data.location,
+                    image_name=f"Image {i + 1}",
+                    image_url=image_url,
+                )
+                await database.execute(insert_query)
+
+        return {"message": "Venue updated successfully"}
+    except Exception as e:
+        import traceback
+        print(f"Error updating venue: {e}")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal Server Error",
+        )
+
+
+
+
+@router.delete("/deleteVenue", response_model=dict)
+async def delete_venue(
+    venue_data: VenueDelete,
+):
+    try:
+        # Check if the venue belongs to the current owner
+        query_check_ownership = select([venue_table.c.ownerusername]).where(
+            (venue_table.c.location == venue_data.location) & (venue_table.c.ownerusername == venue_data.ownerusername)
+        )
+        owner_username = await database.execute(query_check_ownership)
+        if not owner_username:
+            raise HTTPException(
+                status_code=403,
+                detail="You are not the owner of this venue.",
+            )
+
+        # Delete images associated with the venue
+        delete_images_query = images_table.delete().where(
+            (images_table.c.location == venue_data.location) &
+            (images_table.c.ownerusername == venue_data.ownerusername)
+        )
+        await database.execute(delete_images_query)
+
+        # Delete the venue record
+        delete_venue_query = venue_table.delete().where(
+            (venue_table.c.location == venue_data.location) &
+            (venue_table.c.ownerusername == venue_data.ownerusername)
+        )
+        await database.execute(delete_venue_query)
+
+        return {"message": "Venue deleted successfully"}
+    except Exception as e:
+        print(f"Error deleting venue: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal Server Error",
+        )

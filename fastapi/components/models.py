@@ -1,7 +1,7 @@
 # fastapi/models.py
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional, List
+from typing import Optional, List, Union
 from sqlalchemy import Column, String, DateTime, MetaData, Table, func, ForeignKey, Integer, LargeBinary, Text
 from sqlalchemy.types import Float
 from sqlalchemy.ext.declarative import declarative_base
@@ -62,7 +62,25 @@ class VenueResponse(BaseModel):
     images: List[str]
     
     
-    
+class VenueUpdate(BaseModel):
+    ownerusername: Optional[str] = None
+    ownername: Optional[str] = None
+    phonenumber: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    location: Optional[str] = None
+    workingdays: Optional[str] = None
+    price: Optional[int] = None
+    capacity: Optional[int] = None
+    area: Optional[str] = None
+    ground: Optional[str] = None
+    description: Optional[str] = None
+    images: Optional[List[str]] = None
+
+
+class VenueDelete(BaseModel):
+    location: str
+    ownerusername: str
     
     
 
