@@ -8,12 +8,14 @@ from sqlalchemy import MetaData
 from components.authentication import router as auth_router
 from components.database import database
 from components.venues import router as venue_router
+from components.booking import router as booking_router
 
 app = FastAPI()
 
 
 app.include_router(auth_router)
 app.include_router(venue_router)
+app.include_router(booking_router)
 
 metadata = MetaData()
 
