@@ -131,6 +131,7 @@ class PlayerBookingsResponse(BaseModel):
     Player_bookings: List[PlayerBookingResponse]
     
 class TeamCreate(BaseModel):
+    captainid : str
     teamname: str
 
 class TeamResponse(BaseModel):
@@ -138,6 +139,28 @@ class TeamResponse(BaseModel):
     teamname: str
     createdat: datetime
     captainid: str
+
+class InvitationCreate(BaseModel):
+    invitedplayerid: str
+    invitedby: str
+
+class InvitationResponse(BaseModel):
+    invitationid: int
+    teamid: int
+    invitedplayerid: str
+    invitedby: str
+    invitedat: Optional[datetime]
+    status: Optional[str]
+
+# Pydantic model for response
+class VenueLocationResponse(BaseModel):
+    latitude: str
+    longitude: str
+    
+# Pydantic model for venue data weather forescast
+class forecastData(BaseModel):
+    googleMapsUrl : str 
+    
 
     
     

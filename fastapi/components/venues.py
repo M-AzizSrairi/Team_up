@@ -9,10 +9,16 @@ from typing import List, Optional
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
-from .models import VenueCreate, venue_table, images_table, VenueResponse, VenueCreate, VenueUpdate, VenueDelete
+from .models import VenueCreate, venue_table, images_table, VenueResponse, VenueCreate, VenueUpdate, VenueDelete, VenueLocationResponse, venue_table, forecastData
 from .authentication import get_logged_in_user
 from .database import database
 from fastapi import Body
+from urllib.parse import urlparse
+from geopy.geocoders import Nominatim
+from unshortenit import UnshortenIt
+from urllib.parse import urlparse, parse_qs
+import base64
+from bs4 import BeautifulSoup
 
 
 
@@ -68,7 +74,7 @@ async def create_venue(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"detail": "Internal Server Error"},
         )
-import base64
+
 from fastapi import HTTPException
 
 @router.options("/createVenue")
@@ -298,3 +304,127 @@ async def delete_venue(
             status_code=500,
             detail="Internal Server Error",
         )
+
+
+
+geolocator = Nominatim(user_agent="teamup")
+unshortenit = UnshortenIt()
+
+import requests
+
+@router.get("/get_all_venues_locations", response_model=List[VenueLocationResponse])
+async def get_all_venues_locations():
+    """
+    Endpoint to retrieve map data for all venues using direct extraction from Google Maps share links.
+    """
+    query_venues = select([venue_table])
+    venues = await database.fetch_all(query_venues)
+
+    locations_data = []
+
+    for venue in venues:
+        # Extract the location from the Google Maps link
+        location_url = venue['location']
+
+        try:
+            # Unshorten the URL
+            full_url = unshortenit.unshorten(location_url)
+            print(f"Unshortened URL: {full_url}")
+
+            # Use web scraping to extract location data
+            location_data = extract_location_data(full_url)
+            print(f"Location Data: {location_data}")
+
+            locations_data.append(location_data)
+
+        except Exception as e:
+            print(f"Error processing location URL: {location_url}, Error: {e}")
+
+    return locations_data
+
+def extract_location_data(google_maps_url):
+    # Parse Google Maps URL to get path and query parameters
+    parsed_url = urlparse(google_maps_url)
+    path_segments = parsed_url.path.split('/')
+
+
+    # Extract latitude and longitude from the '@' parameter in the query string
+    coordinates = path_segments[4] if len(path_segments) > 2 else ''
+    lat = coordinates[1:coordinates.index(",")]
+    lng = coordinates[coordinates.index(",")+1:coordinates.rindex(",")]
+
+    location_data = {
+        "latitude": (lat) if lat else None,
+        "longitude": (lng) if lng else None,
+    }
+
+    return location_data
+
+
+
+'''@router.get("/get_weather_forecast")
+async def get_weather_forecast(
+    latitude: float = Query(..., description="Latitude of the location"),
+    longitude: float = Query(..., description="Longitude of the location"),
+    date: str = Query(..., description="Date in the format YYYY-MM-DD"),
+    api_key: str = Query(..., description="OpenWeatherMap API key"),
+):
+    try:
+        # Convert date to timestamp
+        timestamp = int(datetime.strptime(date, "%Y-%m-%d").timestamp())
+
+        # Make request to OpenWeatherMap API
+        base_url = "https://api.openweathermap.org/data/2.5/onecall/timemachine"
+        params = {
+            "lat": latitude,
+            "lon": longitude,
+            "dt": timestamp,
+            "appid": api_key,
+        }
+
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()
+
+        weather_data = response.json()
+
+        return weather_data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching weather data: {str(e)}")'''
+    
+import requests
+
+openWeatherMapAPIKey = "97f754341803c04141f91102b2259e00"  
+
+@router.get("/get_weather_forecast")
+async def get_weather_forecast(
+  forecastData: forecastData
+):
+    try:
+        # Convert the URL to a string
+        full_url = unshortenit.unshorten(str(forecastData.googleMapsUrl))
+        print(f"Unshortened URL: {full_url}")
+
+        # Check if the URL is unshortened successfully
+        if not full_url:
+            raise HTTPException(status_code=400, detail="Unable to unshorten the provided URL")
+
+        location_data = extract_location_data(full_url)
+
+        # Now we make the request to OpenWeatherMap API
+        base_url = "https://api.openweathermap.org/data/2.5/forecast"
+        params = {
+            "lat": location_data.get("latitude"), 
+            "lon": location_data.get("longitude"),
+            "appid": openWeatherMapAPIKey,
+        }
+
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()
+
+        weather_data = response.json()
+
+        return weather_data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching weather data: {str(e)}")

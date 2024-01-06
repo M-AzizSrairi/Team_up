@@ -9,6 +9,7 @@ from components.authentication import router as auth_router
 from components.database import database
 from components.venues import router as venue_router
 from components.booking import router as booking_router
+from components.teams import router as team_router
 
 app = FastAPI()
 
@@ -16,6 +17,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(venue_router)
 app.include_router(booking_router)
+app.include_router(team_router)
 
 metadata = MetaData()
 
