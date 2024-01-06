@@ -393,8 +393,8 @@ async def get_weather_forecast(
         raise HTTPException(status_code=500, detail=f"Error fetching weather data: {str(e)}")'''
     
 import requests
+from .Keys import openWeatherMapAPIKey
 
-openWeatherMapAPIKey = "97f754341803c04141f91102b2259e00"  
 
 @router.get("/get_weather_forecast")
 async def get_weather_forecast(
